@@ -1,0 +1,18 @@
+[tool.poetry]
+name = "wisr"
+version = "1.0.0"
+description = "Interact with the OpenAI api from the commandline"
+authors = ["ch55secake"]
+license = "GNU GENERAL PUBLIC LICENSE"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.12"
+typer = "0.14.0"
+requests = "2.32.3"
+pyyaml = "^6.0.2"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
