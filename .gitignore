@@ -173,8 +173,5 @@ cython_debug/
 # idea folder (as this is pyCharm)
 .idea
 
-# poetry lock file
-poetry.lock
-
 # todo file
 todo.md
