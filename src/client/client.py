@@ -1,43 +1,25 @@
-from dataclasses import dataclass
-import requests as req
+import json
+
+import httpx
+from rich.console import Console
+from rich.markdown import Markdown
+
+class Client:
+
+    def __init__(self, api_key: str):
+        self.base_url = "https://api.openai.com/v1/chat/completions"
+        self.model = "gpt-4o-mini"
+        self.api_key = api_key
 
 
-# @dataclass
-# class OpenAIResponse:
-#
-#     model: str
-#     choices: dict
-#
-#     @property
-#     def model(self) -> :
-
-@dataclass
-class Request:
-
-    model: str
-    messages: list[dict]
-
-    @property
-    def model(self) -> str:
-        return self.model
-
-    @property
-    def get_content(self) -> str:
-        """
-        Get the content of the message that you are about to send.
-        :return: a string of the message content that you have sent
-        """
-        return self.messages[1]["content"]
-
-    @classmethod
-    def build_req(cls, query: str) -> dict[str, list[dict]]:
+    def build_req(self, query: str) -> str:
         """
         Build a request that specifies specific context for the chatbot.
         :param query: query passed in by the user.
         :return: return dict to be passed in to post request
         """
-        return {
-            "model": cls.model,
+        return json.dumps({
+            "model": self.model,
             "messages": [
                 {
                  "role": "developer",
@@ -48,13 +30,13 @@ class Request:
                  "content": query
                 }
             ]
+        })
+
+    def build_headers(self) -> dict[str, str]:
+        return {
+            "Authorization": f"Bearer {self.api_key}",
+            "Content-Type": "application/json"
         }
-
-class Client:
-
-    def __init__(self, api_key: str):
-        self.base_url = "https://api.openai.com/v1/chat/completions"
-        self.api_key = api_key
 
 
     def send_query(self, query: str) -> dict:
@@ -64,4 +46,9 @@ class Client:
         :param query:
         :return:
         """
-        req.post(self.base_url, data={"query": query})
+        http_client: httpx.Client = httpx.Client()
+        console = Console()
+        with http_client.stream(method='POST', url=self.base_url, data=self.build_req(query), headers=self.build_headers()) as response:
+            for chunk in response.iter_text():
+                console.print(Markdown(json.loads(chunk)["choices"][0]["message"]["content"]))
+                return json.loads(chunk)
