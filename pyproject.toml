@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "wisr"
+name = "ace"
 version = "1.0.0"
 description = "Interact with the OpenAI api from the commandline"
 authors = ["ch55secake"]

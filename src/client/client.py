@@ -38,6 +38,15 @@ class Client:
             "Content-Type": "application/json"
         }
 
+    @staticmethod
+    def get_content_from_response(response_data: dict) -> str:
+        """
+
+        :param response_data:
+        :return:
+        """
+        return json.loads(response_data["choices"][0]["message"]["content"])
+
 
     def send_query(self, query: str) -> dict:
         """
