@@ -5,13 +5,12 @@ description = "Interact with the OpenAI api from the commandline"
 authors = ["ch55secake"]
 license = "GNU GENERAL PUBLIC LICENSE"
 readme = "README.md"
+packages = [{ include = "src" }]
 
 [tool.poetry.dependencies]
 python = "^3.12"
 typer = "0.15.1"
-requests = "2.32.3"
 httpx = "0.28.1"
-sseclient-py = "1.8.0"
 pyyaml = "^6.0.2"
 
 
