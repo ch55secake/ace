@@ -25,9 +25,9 @@ def does_config_file_exist(filepath: str = ".config/ace/config.yaml") -> bool:
     """
     config_file_path = Path(f"{Path.home()}/{filepath}")
     if config_file_path.is_file():
-        print(f"Configuration file {config_file_path} exists")
+        rich.print(f"Configuration file {config_file_path} [bold green]exists[/bold green].......")
         return True
-    print(f"Configuration file {config_file_path} does not exist")
+    rich.print(f"Configuration file {config_file_path} does [bold red]not exist[/bold red].......")
     return False
 
 
@@ -55,8 +55,9 @@ def write_config_file(filepath: str, api_key: str) -> bool:
     os.makedirs(os.path.dirname(full_path), exist_ok=True)
     with open(full_path, "w") as stream:
         try:
-            # print(f"Writing configuration file: {filepath}/config.yaml")
+            rich.print(f"Creating new [bold green]configuration[/bold green] file: {filepath}/config.yaml")
             yaml.dump(Config(api_key=api_key).to_dict(), stream, default_flow_style=False)
+            rich.print(f"Configuration file [bold green]written[/bold green] successfully! Find it here: {filepath}/config.yaml")
             return True
         except yaml.YAMLError as exc:
             rich.print(f"Error occurred whilst writing configuration file: {exc}")

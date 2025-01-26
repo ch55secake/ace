@@ -1,14 +1,14 @@
 import json
 
 import httpx
-from rich.console import Console
-from rich.markdown import Markdown
+from requests import Response
+
 
 class Client:
 
-    def __init__(self, api_key: str):
+    def __init__(self, api_key: str, model: str = "gpt-4o"):
         self.base_url = "https://api.openai.com/v1/chat/completions"
-        self.model = "gpt-4o-mini"
+        self.model = model
         self.api_key = api_key
 
 
@@ -18,6 +18,14 @@ class Client:
         :param query: query passed in by the user.
         :return: return dict to be passed in to post request
         """
+        if "o1" in self.model:
+            return json.dumps({
+                "model": self.model,
+                "messages": [{
+                    "role": "user",
+                    "content": query,
+                }]
+            })
         return json.dumps({
             "model": self.model,
             "messages": [
@@ -45,7 +53,7 @@ class Client:
         :param response_data:
         :return:
         """
-        return json.loads(response_data["choices"][0]["message"]["content"])
+        return response_data["choices"][0]["message"]["content"]
 
 
     def send_query(self, query: str) -> dict:
@@ -56,8 +64,20 @@ class Client:
         :return:
         """
         http_client: httpx.Client = httpx.Client()
-        console = Console()
-        with http_client.stream(method='POST', url=self.base_url, data=self.build_req(query), headers=self.build_headers()) as response:
+        with http_client.stream(method='POST', url=self.base_url, data=self.build_req(query), headers=self.build_headers(), timeout=None) as response:
             for chunk in response.iter_text():
-                console.print(Markdown(json.loads(chunk)["choices"][0]["message"]["content"]))
+                print(chunk)
                 return json.loads(chunk)
+
+
+    def get_available_list_of_model(self) -> list[str]:
+        """
+
+        """
+        http_client: httpx.Client = httpx.Client()
+        response: Response = http_client.get(url="https://api.openai.com/v1/models", headers=self.build_headers())
+        available_list_of_models: list[str] = []
+        if response.status_code == 200:
+            resp_dict = response.json()["data"]
+            available_list_of_models.extend(key["id"] for key in resp_dict if key["owned_by"] in ["openai", "system"])
+        return available_list_of_models
