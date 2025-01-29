@@ -2,12 +2,11 @@ from typing import Annotated
 
 import rich
 import typer as t
-from rich.console import Console
-from rich.markdown import Markdown
 
-from client import Client
-from config.config import does_config_file_exist, get_config
-from config.config import initialize_config
+from src.client.client import Client
+from src.config.config import does_config_file_exist, get_config
+from src.config.config import initialize_config
+from src.output.output import display_stream_as_markdown
 
 app: t.Typer = t.Typer()
 
@@ -24,9 +23,8 @@ def init(api_key: Annotated[str, t.Argument()], filepath: Annotated[str, t.Optio
 def ask(query: Annotated[str, t.Argument()], model: Annotated[str, t.Option()] = "gpt-4o"):
     api_key: str = get_config().api_key
     open_api_client: Client = Client(api_key=api_key, model=model)
-    console: Console = Console()
-    query_response: dict = open_api_client.send_query(query=query)
-    console.print(Markdown(open_api_client.get_content_from_response(query_response)))
+    query_response: str = open_api_client.send_query(query=query)
+    display_stream_as_markdown(query_response)
 
 
 @app.command(help="Get the available list of models that you can use from the OpenAI API.",
@@ -34,7 +32,7 @@ def ask(query: Annotated[str, t.Argument()], model: Annotated[str, t.Option()] =
 def models() -> None:
     api_key: str = get_config().api_key
     open_api_client: Client = Client(api_key=api_key)
-    available_models: list[str] = open_api_client.get_available_list_of_model()
+    available_models: list[str] = open_api_client.get_available_list_of_models()
     rich.print("[bold]Here is the list of models currently supported by open ai:[/bold]")
     for model in available_models:
         rich.print(f" - [bold green]{model}[/]")
@@ -51,5 +49,8 @@ def callback() -> None:
 
     """
 
+def main():
+   app()
+
 if __name__ == "__main__":
-    app()
+    main()

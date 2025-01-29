@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "ace"
-version = "1.0.0"
+version = "1.0.9"
 description = "Interact with the OpenAI api from the commandline"
 authors = ["ch55secake"]
 license = "GNU GENERAL PUBLIC LICENSE"
@@ -13,6 +13,8 @@ typer = "0.15.1"
 httpx = "0.28.1"
 pyyaml = "^6.0.2"
 
+[tool.poetry.scripts]
+ace="src.ace:main"
 
 [build-system]
 requires = ["poetry-core"]
